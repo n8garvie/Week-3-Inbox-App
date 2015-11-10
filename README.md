@@ -22,8 +22,8 @@ Time Spent: 10 hours
 - Put the menu image view behind the view you added above.
 - Add a screen edge gesture recognizer with a left edge to view.
 
-![Walkthrough 1](Week3_Inbox_App.gif)
-![Walkthrough 2](Week3_Inbox_App-2.gif)
-![Walkthrough 3](Week3_Inbox_App-3.gif)
+![Walkthrough 1](Week 3 Inbox App.gif)
+![Walkthrough 2](Week 3 Inbox App-2.gif)
+![Walkthrough 3](Week 3 Inbox App-3.gif)
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
