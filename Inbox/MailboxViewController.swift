@@ -23,6 +23,7 @@ class MailboxViewController: UIViewController {
     @IBOutlet weak var laterIconImage: UIImageView!
     @IBOutlet weak var listIconImage: UIImageView!
     @IBOutlet weak var messageListImage: UIImageView!
+    @IBOutlet weak var contentView: UIView!
     
     var messageOriginalCenter: CGPoint!
     var messageIsSnoozed: Bool!
@@ -30,6 +31,9 @@ class MailboxViewController: UIViewController {
     
     var archiveIconOriginalCenter: CGPoint!
     var snoozeIconOriginalCenter: CGPoint!
+    
+    var contentViewOriginalCenter: CGPoint!
+    var menuIsOpen: Bool!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -46,11 +50,18 @@ class MailboxViewController: UIViewController {
         laterIconImage.alpha = 0.5
         archiveIconOriginalCenter = archiveIcon.center
         snoozeIconOriginalCenter = snoozeIcon.center
+        contentViewOriginalCenter = contentView.frame.origin
+        menuIsOpen = false
         
         
         var panGestureRecognizer = UIPanGestureRecognizer(target: self, action: "onMessageDrag:")
         
         messageImageView.addGestureRecognizer(panGestureRecognizer)
+        
+        var edgeGesture = UIScreenEdgePanGestureRecognizer(target: self, action: "onEdgePan:")
+        edgeGesture.edges = UIRectEdge.Left
+        contentView.addGestureRecognizer(edgeGesture)
+        
         
         // set background of message view to grey
         messageView.backgroundColor = UIColorFromRGB(0xE0E0E0)
@@ -171,15 +182,78 @@ class MailboxViewController: UIViewController {
         }
     }
     
+    //dismiss the snooze views
     @IBAction func didTapView(sender: AnyObject) {
         UIView.animateWithDuration(0.3) { () -> Void in
-            self.listView.alpha = 0
             self.rescheduleView.alpha = 0
+            self.messageView.alpha = 0
             UIView.animateWithDuration(0.3, delay: 0.3, options: [], animations: { () -> Void in
                 self.messageListImage.frame.origin.y = 75
-                self.messageView.alpha = 0
+                
                 }, completion: { (Bool) -> Void in})
         }
+    }
+    
+    //dismiss the list view
+    @IBAction func didTapListView(sender: AnyObject) {
+        UIView.animateWithDuration(0.3) { () -> Void in
+            self.listView.alpha = 0
+             self.messageView.alpha = 0
+            UIView.animateWithDuration(0.3, delay: 0.3, options: [], animations: { () -> Void in
+                self.messageListImage.frame.origin.y = 75
+               
+                }, completion: { (Bool) -> Void in})
+        }
+    }
+    
+    
+    
+    // pan from edge to reveal menu
+    func onEdgePan(sender: UIScreenEdgePanGestureRecognizer) {
+        
+        var point = sender.locationInView(view)
+        
+        
+        // Relative change in (x,y) coordinates from where gesture began.
+        var translation = sender.translationInView(view)
+        var velocity = sender.velocityInView(view)
+        
+        if sender.state == UIGestureRecognizerState.Began {
+            print("edge panning began")
+            print(velocity.x)
+
+        } else if sender.state == UIGestureRecognizerState.Changed {
+            //moving the contentView on swipe
+            contentView.frame.origin = CGPoint(x: contentViewOriginalCenter.x + translation.x, y: contentViewOriginalCenter.y)
+            
+            if velocity.x > 0 {
+                menuIsOpen == true
+                print("menu is open", velocity.x)
+                
+            } else if velocity.x < 0 {
+                print("menu is closed", velocity.x)
+                menuIsOpen == false
+            }
+            
+        } else if sender.state == UIGestureRecognizerState.Ended{
+            if translation.x > 100 && velocity.x > 0 {
+                print("snap open")
+                UIView.animateWithDuration(0.2, animations: { () -> Void in
+                    self.contentView.frame.origin.x = 276
+                })
+            } else if translation.x < 100 && velocity.x < 0{
+                UIView.animateWithDuration(0.2, animations: { () -> Void in
+                    self.contentView.frame.origin.x = self.contentViewOriginalCenter.x
+                })
+            }
+        }
+
+
+    }
+    @IBAction func onMenuButtonTap(sender: AnyObject) {
+        UIView.animateWithDuration(0.2, animations: { () -> Void in
+            self.contentView.frame.origin.x = self.contentViewOriginalCenter.x
+        })
     }
     
     override func didReceiveMemoryWarning() {
