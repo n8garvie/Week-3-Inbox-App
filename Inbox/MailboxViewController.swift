@@ -236,12 +236,12 @@ class MailboxViewController: UIViewController {
             }
             
         } else if sender.state == UIGestureRecognizerState.Ended{
-            if translation.x > 100 && velocity.x > 0 {
+            if velocity.x > 0 {
                 print("snap open")
                 UIView.animateWithDuration(0.2, animations: { () -> Void in
                     self.contentView.frame.origin.x = 276
                 })
-            } else if translation.x < 100 && velocity.x < 0{
+            } else if velocity.x < 0{
                 UIView.animateWithDuration(0.2, animations: { () -> Void in
                     self.contentView.frame.origin.x = self.contentViewOriginalCenter.x
                 })
